@@ -1,0 +1,12 @@
+name: coreml-service-yolov8
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip:
+      - torch
+      - torchaudio
+      - torchvision
+      - coremltools
+      - ultralytics
