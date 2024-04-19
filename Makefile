@@ -6,13 +6,7 @@ MODEL_EXPORT_DIR=${BUILD_DIR}/model-export
 ZIP_NAME=coreml-service-yolov8m-${RELEASE_TAG}.zip
 SERVER_FILE_IN_PACKAGE=${RELEASE_DIR}/coreml-service-yolov8m
 
-
-test-identity:
-	@echo "checking code signing identity"
-	@if [ -z "${CODE_SIGNING_IDENTITY}" ]; then echo "please set CODE_SIGNING_IDENTITY" && exit 1 ; fi
-	@echo "signing .... with ${CODE_SIGNING_IDENTITY} for ${RELEASE_TAG}"
-
-clean: test-identity
+clean:
 	@echo "------- CLEANING -------"
 	mkdir -p ${BUILD_DIR} 
 	mkdir -p ${RELEASE_DIR} 
@@ -33,12 +27,18 @@ move-to-release-dir:
 	mv ${MODEL_EXPORT_DIR}/yolov8m-oiv7.mlmodelc ${RELEASE_DIR}/.
 	mv ${BUILD_DIR}/release/app ${SERVER_FILE_IN_PACKAGE}
 
-codesign:
+test-identity:
+	@echo "checking code signing identity"
+	@if [ -z "${CODE_SIGNING_IDENTITY}" ]; then echo "please set CODE_SIGNING_IDENTITY" && exit 1 ; fi
+	@echo "signing .... with ${CODE_SIGNING_IDENTITY} for ${RELEASE_TAG}"
+
+codesign: test-identity
 	@echo "--------- todo sign app ---------"
-	echo "TODO: code sign ${SERVER_FILE_IN_PACKAGE}"
+	echo "signing app ${SERVER_FILE_IN_PACKAGE} with ${CODE_SIGNING_IDENTITY}"
+	codesign --deep --force --preserve-metadata=entitlements --verify --options runtime --timestamp --verbose --sign ${CODE_SIGNING_IDENTITY} ${SERVER_FILE_IN_PACKAGE}
 
 release: clean build-server transform-model-to-core-ml move-to-release-dir codesign
-	@echo "--------- building download pkg ---------"
+	@echo "--------- making release ---------"
 	cd ${RELEASE_DIR} && zip -r ${ZIP_NAME} . && shasum -a 256 ${ZIP_NAME}
 
 	
