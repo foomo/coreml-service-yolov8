@@ -20,5 +20,5 @@ conda activate coreml-service-yolov8
 
 # coreml export and conversion
 cd ${MODEL_EXPORT_DIR}
-yolo export model=yolov8m-oiv7.pt format=coreml nms=True
-xcrun coremlcompiler compile yolov8m-oiv7.mlpackage ${MODEL_EXPORT_DIR}
+yolo export model=yolov8m-oiv7.pt format=mlmodel nms=True
+xcrun coremlcompiler compile yolov8m-oiv7.mlmodel ${MODEL_EXPORT_DIR}
